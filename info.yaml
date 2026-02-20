@@ -3,7 +3,7 @@ project:
   title:        "LIF Spiking Neuron"
   author:       "Harshith"
   discord:      ""
-  description:  "A Leaky Integrate-and-Fire spiking neuron. Integrates 8-bit input current, models membrane decay via bit-shift, fires a spike when membrane crosses threshold, and enters a refractory period after each spike."
+  description:  "A Leaky Integrate-and-Fire spiking neuron. Processes 8-bit input current, models membrane decay via bit-shift, fires a spike when membrane crosses threshold, and enters a refractory period after each spike."
   language:     "Verilog"
   clock_hz:     10000000
   tiles:        "1x1"
