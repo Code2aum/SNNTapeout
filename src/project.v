@@ -50,6 +50,6 @@ module tt_um_lif_neuron (
     assign uio_oe  = 8'hFF;
 
     // Suppress unused-input lint warnings
-    wire _unused = &{uio_in, v_mem[15], v_mem[6:0]};
+    wire _unused = &{uio_in, v_mem[15], 1'b0};
 
 endmodule

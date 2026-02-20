@@ -1,5 +1,4 @@
-yaml_version: "6"
-
+# Tiny Tapeout project information
 project:
   title:        "LIF Spiking Neuron"
   author:       "Harshith"
@@ -9,11 +8,15 @@ project:
   clock_hz:     10000000
   tiles:        "1x1"
   top_module:   "tt_um_lif_neuron"
-  source_files:
-    - "src/project.v"
-    - "src/lif_neuron.v"
 
+  # Source files must be in ./src and listed WITHOUT the src/ prefix
+  source_files:
+    - "project.v"
+    - "lif_neuron.v"
+
+# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
+  # Inputs
   ui[0]: "i_input[0]"
   ui[1]: "i_input[1]"
   ui[2]: "i_input[2]"
@@ -22,6 +25,8 @@ pinout:
   ui[5]: "i_input[5]"
   ui[6]: "i_input[6]"
   ui[7]: "i_input[7]"
+
+  # Outputs
   uo[0]: "v_mem[0]"
   uo[1]: "v_mem[1]"
   uo[2]: "v_mem[2]"
@@ -30,6 +35,8 @@ pinout:
   uo[5]: "v_mem[5]"
   uo[6]: "v_mem[6]"
   uo[7]: "spike_out"
+
+  # Bidirectional pins
   uio[0]: "v_mem[7]"
   uio[1]: "v_mem[8]"
   uio[2]: "v_mem[9]"
@@ -38,3 +45,6 @@ pinout:
   uio[5]: "v_mem[12]"
   uio[6]: "v_mem[13]"
   uio[7]: "v_mem[14]"
+
+# Do not change!
+yaml_version: 6
