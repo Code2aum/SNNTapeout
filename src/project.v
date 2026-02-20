@@ -1,27 +1,55 @@
-/*
- * Copyright (c) 2024 Your Name
- * SPDX-License-Identifier: Apache-2.0
- */
-
+// ================================================================
+//  project.v  —  TinyTapeout Sky130 Top-Level Wrapper
+//  Module name MUST match info.yaml → top_module field EXACTLY
+//  Pin interface is FIXED by TinyTapeout — do not rename ports
+// ================================================================
 `default_nettype none
 
-module tt_um_example (
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
-    input  wire [7:0] uio_in,   // IOs: Input path
-    output wire [7:0] uio_out,  // IOs: Output path
-    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
-    input  wire       ena,      // always 1 when the design is powered, so you can ignore it
-    input  wire       clk,      // clock
-    input  wire       rst_n     // reset_n - low to reset
+module tt_um_lif_neuron (
+    input  wire [7:0] ui_in,    // 8 dedicated input pins
+    output wire [7:0] uo_out,   // 8 dedicated output pins
+    input  wire [7:0] uio_in,   // 8 bidirectional pins (input path)
+    output wire [7:0] uio_out,  // 8 bidirectional pins (output path)
+    output wire [7:0] uio_oe,   // bidir output-enable (1 = output mode)
+    input  wire       ena,      // enable from TinyTapeout controller
+    input  wire       clk,      // system clock
+    input  wire       rst_n     // active-low reset
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+    // ── Internal wires ───────────────────────────────────────────
+    wire        spike;
+    wire [15:0] v_mem;
 
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+    // ── Instantiate the LIF neuron core ─────────────────────────
+    lif_neuron #(
+        .DATA_WIDTH   (16),
+        .WEIGHT_WIDTH (8),
+        .THRESHOLD    (16'h0100),
+        .LEAK_SHIFT   (4),
+        .V_RESET      (16'h0000),
+        .REFRACTORY   (4)
+    ) lif_inst (
+        .clk       (clk),
+        .rst_n     (rst_n),
+        .enable    (ena),
+        .i_input   (ui_in),
+        .i_valid   (1'b1),
+        .spike_out (spike),
+        .v_mem_out (v_mem)
+    );
+
+    // ── Pin Mapping ──────────────────────────────────────────────
+    // uo_out[7]   = spike         (MSB = spike flag)
+    // uo_out[6:0] = v_mem[6:0]   (lower 7 membrane bits)
+    assign uo_out = {spike, v_mem[6:0]};
+
+    // uio_out = v_mem[14:7]       (upper 8 membrane bits)
+    assign uio_out = v_mem[14:7];
+
+    // All bidir pins → output mode
+    assign uio_oe  = 8'hFF;
+
+    // Suppress unused-input lint warnings
+    wire _unused = &{uio_in, v_mem[15], v_mem[6:0]};
 
 endmodule
