@@ -1,4 +1,4 @@
-yaml_version: "0.4"
+yaml_version: "6"
 
 project:
   title:        "LIF Spiking Neuron"
